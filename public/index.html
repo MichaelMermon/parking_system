@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Parking System</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+
+<body>
+    <!-- Header section containing the navigation bar -->
+    <header>
+        <!-- Navigation bar with site title and links to other pages -->
+        <nav class="navbar">
+            <h1>Car Parking System</h1>
+            <div>
+                <!-- Navigation links to the Home, My Reservation, and About Us pages -->
+                <a href="index.html">Home</a>
+                <a href="myreservation.html">My Reservation</a>
+                <a href="about.html">About Us</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main content section for the Parking Availability and Reservation -->
+    <main class="container">
+        
+        <!-- Section showing the parking lot image and parking status -->
+        <section class="parking-lot">
+            <!-- Heading for the parking availability section -->
+            <h2>Parking Availability</h2>
+            <!-- Image representing the parking lot -->
+            <img src="SLOTS.png" alt="Parking Lot">
+
+            <!-- Div container displaying the status of each parking slot -->
+            <div class="parking-status" id="parking-status">
+                <!-- First row of parking slots -->
+                <div class="slot-container1">
+                    <!-- Individual slot container with slot information and status -->
+                    <div class="slot" id="slot-1">
+                        <h3>Slot 1</h3>
+                        <p>Status: <span id="status-1">Loading...</span></p>
+                    </div>
+                    <div class="slot" id="slot-2">
+                        <h3>Slot 2</h3>
+                        <p>Status: <span id="status-2">Loading...</span></p>
+                    </div>
+                    <div class="slot" id="slot-3">
+                        <h3>Slot 3</h3>
+                        <p>Status: <span id="status-3">Loading...</span></p>
+                    </div>
+                </div>
+                <!-- Second row of parking slots -->
+                <div class="slot-container2">
+                    <div class="slot" id="slot-4">
+                        <h3>Slot 4</h3>
+                        <p>Status: <span id="status-4">Loading...</span></p>
+                    </div>
+                    <div class="slot" id="slot-5">
+                        <h3>Slot 5</h3>
+                        <p>Status: <span id="status-5">Loading...</span></p>
+                    </div>
+                    <div class="slot" id="slot-6">
+                        <h3>Slot 6</h3>
+                        <p>Status: <span id="status-6">Loading...</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <br><br>
+
+        <!-- Section for making a reservation -->
+        <section class="reservation">
+            <!-- Heading for the reservation form -->
+            <h2 class="h2reserve">Make a Reservation</h2>
+            
+            <!-- Reservation form allowing the user to select slot and provide details -->
+            <form id="reservation-form">
+                <!-- Label and dropdown for selecting a parking slot -->
+                <label for="slot">Select Slot:</label>
+                <select id="slot" name="slot">
+                    <option value="1">Slot 1</option>
+                    <option value="2">Slot 2</option>
+                    <option value="3">Slot 3</option>
+                    <option value="4">Slot 4</option>
+                    <option value="5">Slot 5</option>
+                    <option value="6">Slot 6</option>
+                </select>
+
+                <!-- Labels and input fields for selecting start and end date & time -->
+                <label for="start">Start Date & Time:</label>
+                <input type="datetime-local" id="start" name="start" required>
+                <label for="end">End Date & Time:</label>
+                <input type="datetime-local" id="end" name="end" required>
+
+                <!-- Labels and input fields for entering user name and contact number -->
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="contact">Contact Number:</label>
+                <input type="tel" id="contact" name="contact" required>
+                
+                <!-- Button to submit the reservation form -->
+                <button type="submit">Reserve Now</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Footer section with copyright notice -->
+    <footer class="footer">
+        <p>&copy; 2024 Car Parking System. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Link to external JavaScript file for functionality -->
+    <script src="scripts/scripts.js"></script>
+</body>
+
+</html>

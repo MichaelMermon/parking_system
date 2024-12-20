@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Parking System</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+
+<body>
+    <!-- Header section containing the navigation bar -->
+    <header>
+        <!-- Navigation bar with site title and links to other pages -->
+        <nav class="navbar">
+            <h1>Car Parking System</h1>
+            <div>
+                <!-- Navigation links to the Home, My Reservation, and About Us pages -->
+                <a href="index.html">Home</a>
+                <a href="myreservation.html">My Reservation</a>
+                <a href="about.html">About Us</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main content section for My Reservation -->
+    <div id="reservation-container">
+        <!-- Heading for My Reservation page -->
+        <h1>My Reservation</h1>
+        
+        <!-- Reservation details container -->
+        <div id="reservation-details">
+            
+            <!-- Form to enter the contact number to view the reservation -->
+            <form id="contact-form">
+                <!-- Label and input field for entering contact number -->
+                <label for="contact">Enter your contact number to view your reservation:</label>
+                <input type="text" id="contact" name="contact" placeholder="Enter your contact number" required>
+                <!-- Submit button for the form -->
+                <button type="submit">Submit</button>
+            </form>
+
+            <br>
+
+            <!-- Container where reservation details will be dynamically populated -->
+            <div id="reservation-info">
+                <!-- Reservation details will appear here after submitting the form -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer section with copyright information -->
+    <footer>
+        <div class="footer">
+            <!-- Copyright message -->
+            <p>&copy; 2024 Car Parking System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Link to SweetAlert2 library for pop-up alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Link to custom JavaScript for handling the functionality of this page -->
+    <script src="scripts/script2.js"></script>
+</body>
+
+</html>
