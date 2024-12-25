@@ -12,12 +12,13 @@ app.use(cors());
 // Serve static files from 'public' folder for the frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MySQL database connection setup using environment variables
+// MySQL database connection setup using provided credentials
 const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
+  host: 'sql12.freesqldatabase.com',   // Host from freesqldatabase.com
+  user: 'sql12754090',                 // Database user
+  password: 'lSyCf4zATI',             // Database password
+  database: 'sql12754090',             // Database name
+  port: 3306                          // Port number
 });
 
 // Connect to the MySQL database
