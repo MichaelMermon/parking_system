@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Dynamically assign the port for Vercel
 
 // Use CORS middleware to allow requests from different origins
 app.use(cors());
@@ -12,7 +12,7 @@ app.use(cors());
 // Serve static files from 'public' folder for the frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MySQL database connection setup using provided credentials
+// MySQL database connection setup using environment variables
 const db = mysql.createConnection({
   host: 'sql12.freesqldatabase.com',   // Host from freesqldatabase.com
   user: 'sql12754090',                 // Database user
@@ -188,7 +188,7 @@ app.post('/api/cancel-reservation', (req, res) => {
   });
 });
 
-// Start the Express server on port 3000
+// Start the Express server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
