@@ -41,6 +41,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const name = document.getElementById('name').value;
         const contact = document.getElementById('contact').value;
 
+        // Validate form data
+        if (!slot || !start || !end || !name || !contact) {
+            alert('All fields are required!');
+            return;
+        }
+
         // Send the reservation data to the backend
         fetch(`${apiUrl}/api/reserve`, {
             method: 'POST',
