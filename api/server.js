@@ -1,33 +1,30 @@
-const express = require('express');
 const mysql = require('mysql2');
-const bodyParser = require('body-parser');
-const path = require('path');
 const cors = require('cors');
+const express = require('express');
+
+// Initialize Express app
 const app = express();
-const port = 3000;
 
-// Use CORS middleware to allow requests from different origins
+// CORS middleware to allow requests from different origins
 app.use(cors());
+app.use(express.json());
 
-// Serve static files from 'public' folder for the frontend
-app.use(express.static(path.join(__dirname, 'public')));
-
-// MySQL database connection setup
+// MySQL database connection setup (use environment variables for security)
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'Aynmondealize0369@',
-  database: 'parking_system',
+  host: process.env.DB_HOST || 'localhost',  // Use environment variables in Vercel
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'Aynmondealize0369@',
+  database: process.env.DB_NAME || 'parking_system',
 });
 
-// Connect to the MySQL database
+// Connect to MySQL database
 db.connect((err) => {
-  if (err) throw err;
+  if (err) {
+    console.error('Failed to connect to MySQL database:', err);
+    return;
+  }
   console.log('Connected to MySQL database');
 });
-
-// Middleware to parse incoming request bodies in JSON format
-app.use(bodyParser.json());
 
 // Function to check and clean up expired reservations
 function checkExpiredReservations() {
@@ -86,24 +83,22 @@ app.get('/api/slots', (req, res) => {
 app.post('/api/reserve', (req, res) => {
   const { slot_number, start, end, name, contact } = req.body;
 
-  // Check if all required fields are provided
   if (!slot_number || !start || !end || !name || !contact) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  // Query to check if the selected slot is available
+  // Check if the selected slot is available
   const checkSlotQuery = 'SELECT * FROM slots WHERE slot_number = ? AND status = TRUE';
   db.query(checkSlotQuery, [slot_number], (err, results) => {
     if (err) {
       return res.status(500).json({ error: 'Failed to check slot availability' });
     }
 
-    // If slot is unavailable, return an error
     if (results.length === 0) {
       return res.status(400).json({ error: 'Slot is not available' });
     }
 
-    // Insert the reservation details into the reservations table
+    // Insert reservation into the reservations table
     const reserveQuery = 'INSERT INTO reservations (slot_number, start, end, name, contact) VALUES (?, ?, ?, ?, ?)';
     db.query(reserveQuery, [slot_number, start, end, name, contact], (err) => {
       if (err) {
@@ -136,13 +131,11 @@ app.get('/api/reservations', (req, res) => {
       return res.status(500).json({ error: 'Failed to fetch reservation history' });
     }
 
-    // If no reservations found, return a message
     if (results.length === 0) {
       return res.status(404).json({ message: 'No reservations found' });
     }
 
-    // Return the most recent reservation
-    res.json(results[0]);
+    res.json(results[0]); // Return the most recent reservation
   });
 });
 
@@ -160,21 +153,18 @@ app.post('/api/cancel-reservation', (req, res) => {
       return res.status(500).json({ error: 'Failed to fetch reservation' });
     }
 
-    // If reservation is not found, return an error
     if (results.length === 0) {
       return res.status(404).json({ error: 'Reservation not found' });
     }
 
     const { slot_number } = results[0];
 
-    // Delete the reservation from the database
     const deleteReservationQuery = 'DELETE FROM reservations WHERE id = ?';
     db.query(deleteReservationQuery, [id], (err) => {
       if (err) {
         return res.status(500).json({ error: 'Failed to cancel reservation' });
       }
 
-      // Update the slot status to available
       const updateSlotQuery = 'UPDATE slots SET status = TRUE WHERE slot_number = ?';
       db.query(updateSlotQuery, [slot_number], (err) => {
         if (err) {
@@ -187,7 +177,5 @@ app.post('/api/cancel-reservation', (req, res) => {
   });
 });
 
-// Start the Express server on port 3000
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+// Export the Express app as a serverless function (required by Vercel)
+module.exports = app;
