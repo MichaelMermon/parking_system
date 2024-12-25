@@ -14,10 +14,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // PostgreSQL database connection setup
 const pool = new Pool({
-  user: 'your-username',       // Your Supabase username
-  host: 'db.supabase.co',      // Replace with your Supabase database host
-  database: 'your-database',   // Your Supabase database name
-  password: 'your-password',   // Your Supabase password
+  user: 'postgres',       // Your Supabase username
+  host: 'db.iqqqoqtfrelkdnzbrxoj.supabase.co',      // Replace with your Supabase database host
+  database: 'postgres',   // Your Supabase database name
+  password: 'POSTGRES_PASSWORD',   // Your Supabase password
   port: 5432,                  // Default PostgreSQL port
 });
 
