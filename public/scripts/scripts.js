@@ -1,5 +1,5 @@
 // Get API URL from environment variables (Vercel or local)
-const apiUrl = process.env.API_URL || 'http://localhost:3000';  // Default to localhost if not set
+const apiUrl = 'https://vercel.com/michaels-projects-bfa95b83/parking-system' || 'http://localhost:3000';  // Default to localhost if not set
 
 // Function to update the status of the parking slots
 function updateSlotStatus(slotId, status) {
