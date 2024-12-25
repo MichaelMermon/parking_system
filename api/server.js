@@ -11,10 +11,10 @@ app.use(express.json());
 
 // MySQL database connection setup (use environment variables for security)
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost',  // Use environment variables in Vercel
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'Aynmondealize0369@',
-  database: process.env.DB_NAME || 'parking_system',
+  host: 'sql12.freesqldatabase.com' || 'localhost',  // Use environment variables in Vercel
+  user: 'sql12754090' || 'root',
+  password: 'lSyCf4zATI' || 'Aynmondealize0369@',
+  database: 'sql12754090' || 'parking_system',
 });
 
 // Connect to MySQL database
