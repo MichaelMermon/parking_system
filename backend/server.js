@@ -1,5 +1,5 @@
 const express = require('express');
-const { Pool } = require('pg');
+const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
@@ -12,55 +12,78 @@ app.use(cors());
 // Serve static files from 'public' folder for the frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// PostgreSQL database connection setup
-const pool = new Pool({
-  user: 'MichaelMermon',       // Your Supabase username
-  host: 'PGPORT',      // Replace with your Supabase database host
-  database: 'parking_system',   // Your Supabase database name
-  password: 'Aynmondealize0369@',   // Your Supabase password
-  port: 5432,                  // Default PostgreSQL port
+// MySQL database connection setup using environment variables
+const db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+});
+
+// Connect to the MySQL database
+db.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to MySQL database');
 });
 
 // Middleware to parse incoming request bodies in JSON format
 app.use(bodyParser.json());
 
 // Function to check and clean up expired reservations
-async function checkExpiredReservations() {
+function checkExpiredReservations() {
   const currentTime = new Date();
 
-  try {
-    const result = await pool.query('SELECT * FROM reservations WHERE "end" <= $1', [currentTime]);
+  // Query to find expired reservations
+  const query = 'SELECT * FROM reservations WHERE end <= ?';
+  db.query(query, [currentTime], (err, results) => {
+    if (err) {
+      console.error('Failed to fetch expired reservations:', err);
+      return;
+    }
 
     // For each expired reservation, update the slot status and delete the reservation
-    result.rows.forEach(async (reservation) => {
-      const { slot_id, id } = reservation;
+    results.forEach((reservation) => {
+      const { slot_number, id } = reservation;
 
       // Update the slot status to available
-      await pool.query('UPDATE slots SET status = TRUE WHERE id = $1', [slot_id]);
+      const updateSlotQuery = 'UPDATE slots SET status = TRUE WHERE slot_number = ?';
+      db.query(updateSlotQuery, [slot_number], (err) => {
+        if (err) {
+          console.error(`Failed to update slot ${slot_number}:`, err);
+        } else {
+          console.log(`Slot ${slot_number} marked as available`);
+        }
+      });
 
       // Delete the expired reservation
-      await pool.query('DELETE FROM reservations WHERE id = $1', [id]);
+      const deleteReservationQuery = 'DELETE FROM reservations WHERE id = ?';
+      db.query(deleteReservationQuery, [id], (err) => {
+        if (err) {
+          console.error(`Failed to delete reservation ID ${id}:`, err);
+        } else {
+          console.log(`Reservation ID ${id} removed`);
+        }
+      });
     });
-  } catch (err) {
-    console.error('Error checking expired reservations:', err);
-  }
+  });
 }
 
 // Schedule the expiration check every minute
 setInterval(checkExpiredReservations, 60 * 1000); // Runs every 60 seconds
 
 // API to fetch the parking slot status (available or occupied)
-app.get('/api/slots', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM slots');
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch slot data' });
-  }
+app.get('/api/slots', (req, res) => {
+  const query = 'SELECT * FROM slots';
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to fetch slot data' });
+    }
+    res.json(results); // Send slot data as response
+  });
 });
 
 // API to reserve a parking slot
-app.post('/api/reserve', async (req, res) => {
+app.post('/api/reserve', (req, res) => {
   const { slot_number, start, end, name, contact } = req.body;
 
   // Check if all required fields are provided
@@ -68,77 +91,100 @@ app.post('/api/reserve', async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  try {
-    // Check if the selected slot is available
-    const slotResult = await pool.query('SELECT * FROM slots WHERE slot_number = $1 AND status = TRUE', [slot_number]);
+  // Query to check if the selected slot is available
+  const checkSlotQuery = 'SELECT * FROM slots WHERE slot_number = ? AND status = TRUE';
+  db.query(checkSlotQuery, [slot_number], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to check slot availability' });
+    }
 
-    if (slotResult.rows.length === 0) {
+    // If slot is unavailable, return an error
+    if (results.length === 0) {
       return res.status(400).json({ error: 'Slot is not available' });
     }
 
     // Insert the reservation details into the reservations table
-    const reserveResult = await pool.query(
-      'INSERT INTO reservations (slot_id, start, "end", name, contact) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [slotResult.rows[0].id, start, end, name, contact]
-    );
+    const reserveQuery = 'INSERT INTO reservations (slot_number, start, end, name, contact) VALUES (?, ?, ?, ?, ?)';
+    db.query(reserveQuery, [slot_number, start, end, name, contact], (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to reserve slot' });
+      }
 
-    // Update the slot status to "occupied"
-    await pool.query('UPDATE slots SET status = FALSE WHERE id = $1', [slotResult.rows[0].id]);
-
-    res.status(201).json({ message: 'Reservation successful', reservationId: reserveResult.rows[0].id });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to reserve slot' });
-  }
+      // Update the slot status to "occupied"
+      const updateSlotQuery = 'UPDATE slots SET status = FALSE WHERE slot_number = ?';
+      db.query(updateSlotQuery, [slot_number], (err) => {
+        if (err) {
+          return res.status(500).json({ error: 'Failed to update slot status' });
+        }
+        res.status(201).json({ message: 'Reservation successful' });
+      });
+    });
+  });
 });
 
 // API to fetch a reservation by contact number
-app.get('/api/reservations', async (req, res) => {
+app.get('/api/reservations', (req, res) => {
   const { contact } = req.query;
 
   if (!contact) {
     return res.status(400).json({ error: 'Contact is required' });
   }
 
-  try {
-    const result = await pool.query('SELECT * FROM reservations WHERE contact = $1 ORDER BY created_at DESC', [contact]);
+  const query = 'SELECT * FROM reservations WHERE contact = ? ORDER BY created_at DESC';
+  db.query(query, [contact], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to fetch reservation history' });
+    }
 
-    if (result.rows.length === 0) {
+    // If no reservations found, return a message
+    if (results.length === 0) {
       return res.status(404).json({ message: 'No reservations found' });
     }
 
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch reservation history' });
-  }
+    // Return the most recent reservation
+    res.json(results[0]);
+  });
 });
 
 // API to cancel a reservation
-app.post('/api/cancel-reservation', async (req, res) => {
+app.post('/api/cancel-reservation', (req, res) => {
   const { id } = req.body;
 
   if (!id) {
     return res.status(400).json({ error: 'Reservation ID is required' });
   }
 
-  try {
-    const result = await pool.query('SELECT * FROM reservations WHERE id = $1', [id]);
+  const checkReservationQuery = 'SELECT * FROM reservations WHERE id = ?';
+  db.query(checkReservationQuery, [id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to fetch reservation' });
+    }
 
-    if (result.rows.length === 0) {
+    // If reservation is not found, return an error
+    if (results.length === 0) {
       return res.status(404).json({ error: 'Reservation not found' });
     }
 
-    const { slot_id } = result.rows[0];
+    const { slot_number } = results[0];
 
-    // Delete the reservation
-    await pool.query('DELETE FROM reservations WHERE id = $1', [id]);
+    // Delete the reservation from the database
+    const deleteReservationQuery = 'DELETE FROM reservations WHERE id = ?';
+    db.query(deleteReservationQuery, [id], (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to cancel reservation' });
+      }
 
-    // Update the slot status to available
-    await pool.query('UPDATE slots SET status = TRUE WHERE id = $1', [slot_id]);
+      // Update the slot status to available
+      const updateSlotQuery = 'UPDATE slots SET status = TRUE WHERE slot_number = ?';
+      db.query(updateSlotQuery, [slot_number], (err) => {
+        if (err) {
+          return res.status(500).json({ error: 'Failed to update slot status' });
+        }
 
-    res.status(200).json({ success: true, message: 'Reservation cancelled successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to cancel reservation' });
-  }
+        res.status(200).json({ success: true, message: 'Reservation cancelled successfully' });
+      });
+    });
+  });
 });
 
 // Start the Express server on port 3000
