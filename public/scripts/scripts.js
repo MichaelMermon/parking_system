@@ -1,3 +1,6 @@
+// Get API URL from environment variables (Vercel or local)
+const apiUrl = process.env.API_URL || 'http://localhost:3000';  // Default to localhost if not set
+
 // Function to update the status of the parking slots
 function updateSlotStatus(slotId, status) {
     const statusElement = document.getElementById(`status-${slotId}`);
@@ -9,7 +12,7 @@ function updateSlotStatus(slotId, status) {
 
 // Function to fetch slot status from the backend
 function fetchSlotStatus() {
-    fetch('http://localhost:3000/api/slots')
+    fetch(`${apiUrl}/api/slots`)
         .then(response => response.json())
         .then(slots => {
             if (Array.isArray(slots)) {
@@ -39,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const contact = document.getElementById('contact').value;
 
         // Send the reservation data to the backend
-        fetch('http://localhost:3000/api/reserve', {
+        fetch(`${apiUrl}/api/reserve`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -76,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Function to fetch reservation for a specific contact
 function fetchReservation(contact) {
-    fetch(`http://localhost:3000/api/reservations?contact=${contact}`)
+    fetch(`${apiUrl}/api/reservations?contact=${contact}`)
         .then(response => response.json())
         .then(data => {
             if (data.message) {
