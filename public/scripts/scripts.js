@@ -12,7 +12,7 @@ function updateSlotStatus(slotId, status) {
 
 // Function to fetch slot status from the backend
 function fetchSlotStatus() {
-    fetch(`${apiUrl}/api/slots`)
+    fetch(`${apiUrl}/api/slots`)  // API URL is dynamically set to either Vercel or localhost
         .then(response => response.json())
         .then(slots => {
             if (Array.isArray(slots)) {
