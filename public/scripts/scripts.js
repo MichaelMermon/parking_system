@@ -1,5 +1,5 @@
 // Fetch API URL from environment variables (Vercel provides them automatically for the frontend)
-const apiUrl = 'https://parking-system-nine.vercel.app'; // Use the production backend URL
+const apiUrl = 'https://parking-system-nine.vercel.app/'; // Use the production backend URL
 
 // Function to update the status of a parking slot
 function updateSlotStatus(slotId, status) {
