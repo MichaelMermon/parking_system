@@ -1,3 +1,6 @@
+// Base URL for the API (change this to your Vercel deployment URL)
+const API_BASE_URL = 'https://parking-system-nine.vercel.app/api';
+
 // Function to update the status of the parking slots
 function updateSlotStatus(slotId, status) {
     const statusElement = document.getElementById(`status-${slotId}`);
@@ -9,7 +12,7 @@ function updateSlotStatus(slotId, status) {
 
 // Function to fetch slot status from the backend
 function fetchSlotStatus() {
-    fetch('http://localhost:3000/api/slots')
+    fetch(`${API_BASE_URL}/slots`)
         .then(response => response.json())
         .then(slots => {
             if (Array.isArray(slots)) {
@@ -39,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const contact = document.getElementById('contact').value;
 
         // Send the reservation data to the backend
-        fetch('http://localhost:3000/api/reserve', {
+        fetch(`${API_BASE_URL}/reserve`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -76,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Function to fetch reservation for a specific contact
 function fetchReservation(contact) {
-    fetch(`http://localhost:3000/api/reservations?contact=${contact}`)
+    fetch(`${API_BASE_URL}/reservations?contact=${contact}`)
         .then(response => response.json())
         .then(data => {
             if (data.message) {
@@ -114,6 +117,7 @@ function displayReservation(reservation) {
 // Function to generate a QR code for the reservation
 function generateQRCode(reservation) {
     const qrCodeContainer = document.getElementById('qr-code');
+    qrCodeContainer.innerHTML = ""; // Clear existing QR code
     const qrCodeData = `Reservation for ${reservation.name}\nSlot: ${reservation.slot_number}\nStart: ${reservation.start}\nEnd: ${reservation.end}`;
     new QRCode(qrCodeContainer, {
         text: qrCodeData,
