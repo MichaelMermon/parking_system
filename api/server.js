@@ -4,25 +4,29 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 
-// Use CORS middleware to allow requests from different origins
-app.use(cors());
+// Use CORS middleware to allow requests from specific origins
+app.use(cors({
+  origin: 'https://parking-system-nine.vercel.app/', // Adjust to your frontend URL for production
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 
 // Middleware to parse incoming request bodies in JSON format
 app.use(bodyParser.json());
 
 // MySQL database connection setup using environment variables
 const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_DATABASE || 'parking',
 });
 
 // Connect to the MySQL database
 db.connect((err) => {
   if (err) {
     console.error('Failed to connect to the database:', err);
-    process.exit(1);
+    process.exit(1); // Terminate the process on critical error
   }
   console.log('Connected to MySQL database');
 });
