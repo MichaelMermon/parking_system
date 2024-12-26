@@ -6,7 +6,7 @@ const app = express();
 
 // Use CORS middleware to allow requests from specific origins
 app.use(cors({
-  origin: 'https://parking-system-nine.vercel.app/', // Adjust to your frontend URL for production
+  origin: 'https://parking-system-6cj1hel6f-michaels-projects-bfa95b83.vercel.app/', // Adjust to your frontend URL for production
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -177,3 +177,11 @@ app.post('/api/cancel-reservation', (req, res) => {
 
 // Export the app for Vercel
 module.exports = app;
+
+// Start the server (for local development or specific environments)
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
