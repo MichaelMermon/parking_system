@@ -6,7 +6,7 @@ const app = express();
 
 // Use CORS middleware to allow requests from specific origins
 app.use(cors({
-  origin: 'https://parking-system-6cj1hel6f-michaels-projects-bfa95b83.vercel.app/', // Adjust to your frontend URL for production
+  origin: 'https://parking-system-6cj1hel6f-michaels-projects-bfa95b83.vercel.app', // Adjust to your frontend URL for production
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -45,6 +45,7 @@ function checkExpiredReservations() {
     results.forEach((reservation) => {
       const { slot_number, id } = reservation;
 
+      // Mark the slot as available again
       const updateSlotQuery = 'UPDATE slots SET status = TRUE WHERE slot_number = ?';
       db.query(updateSlotQuery, [slot_number], (err) => {
         if (err) {
@@ -54,6 +55,7 @@ function checkExpiredReservations() {
         }
       });
 
+      // Remove the expired reservation from the database
       const deleteReservationQuery = 'DELETE FROM reservations WHERE id = ?';
       db.query(deleteReservationQuery, [id], (err) => {
         if (err) {
@@ -98,12 +100,14 @@ app.post('/api/reserve', (req, res) => {
       return res.status(400).json({ error: 'Slot is not available' });
     }
 
+    // Reserve the slot by inserting into reservations table
     const reserveQuery = 'INSERT INTO reservations (slot_number, start, end, name, contact) VALUES (?, ?, ?, ?, ?)';
     db.query(reserveQuery, [slot_number, start, end, name, contact], (err) => {
       if (err) {
         return res.status(500).json({ error: 'Failed to reserve slot' });
       }
 
+      // Update the slot status to unavailable
       const updateSlotQuery = 'UPDATE slots SET status = FALSE WHERE slot_number = ?';
       db.query(updateSlotQuery, [slot_number], (err) => {
         if (err) {
@@ -175,7 +179,7 @@ app.post('/api/cancel-reservation', (req, res) => {
   });
 });
 
-// Export the app for Vercel
+// Export the app for Vercel serverless deployment
 module.exports = app;
 
 // Start the server (for local development or specific environments)
