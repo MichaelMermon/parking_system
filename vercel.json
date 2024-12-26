@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",  // Your entry file (usually server.js or index.js)
+      "use": "@vercel/node"  // Specifies using the Node.js runtime
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",  // This will route all requests starting with /api/ to your Express server
+      "dest": "server.js"
+    }
+  ]
+}
