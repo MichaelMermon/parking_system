@@ -1,5 +1,5 @@
 // Fetch API URL from environment variables (Vercel provides them automatically for the frontend)
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const apiUrl = 'https://parking-system-nine.vercel.app'; // Use the production backend URL
 
 // Function to update the status of the parking slots
 function updateSlotStatus(slotId, status) {
