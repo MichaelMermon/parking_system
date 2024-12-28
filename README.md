@@ -1,4 +1,4 @@
-Setup Guide
+Local Setup Guide
 
 Prerequisites
 Ensure you have the following installed:
