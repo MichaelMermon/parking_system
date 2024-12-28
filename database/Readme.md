@@ -7,7 +7,7 @@ MySQL
 
 Step 1: Download and Prepare the Repository
 1. Download the repository from GitHub:
-Parking System GitHub Repository.
+    [Parking System GitHub Repository.](https://github.com/MichaelMermon/parking_system.git?authuser=0)
 2. Extract the downloaded zip file to a folder on your computer.
 3. Open the Backend folder:
   - Right-click inside the folder and select Open in Terminal (or use your terminal to navigate to the folder).
