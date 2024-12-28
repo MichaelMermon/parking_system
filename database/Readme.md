@@ -21,7 +21,7 @@ Step 2: Import the Database
 2. Launch MySQL Workbench and connect to your MySQL server.
 3. Import the database:
   - In the top menu, go to Server > Data Import.
-  - Select Import from Self-Contained File and browse to the .sql file in the Backend folder.
+  - Select Import from Self-Contained File and browse to the .sql file in the database folder.
   - Choose your target schema (database name) or create a new one.
   - Click Start Import to complete the process.
 
